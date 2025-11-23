@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { createLink } from "../api/Links";
+import ErrorBox from "./ErrorBox";
 
 export default function AddLinkForm({ onClose, onCreated, baseUrl }) {
   const [targetUrl, setTargetUrl] = useState("");
@@ -58,7 +59,7 @@ export default function AddLinkForm({ onClose, onCreated, baseUrl }) {
               placeholder="6-8 letters or numbers"
             />
           </div>
-          {error && <div className="text-red-600 text-sm">{error}</div>}
+          {error && <ErrorBox message={error} />}
           {created && (
             <div className="text-green-700 text-sm">
               Created:{" "}

@@ -9,7 +9,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const baseUrl =
-    process.env.REACT_APP_API_BASE || window.location.origin;
+    process.env.REACT_APP_API_BASE;
 
   const load = async () => {
     setLoading(true);

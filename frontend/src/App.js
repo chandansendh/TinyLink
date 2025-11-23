@@ -14,7 +14,7 @@ export default function App() {
           <Route path="/code/:code" element={<StatsPage />} />
         </Routes>
       </main>
-      <footer className="fixed bottom-0 text-xl font-bold text-slate-500 left-0 w-full bg-white p-6 text-center shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
+      <footer className="fixed bottom-0 h-10 flex justify-center items-center text-xl font-bold text-slate-500 left-0 w-full bg-white p-6 text-center shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
         © 2025 TinyLink™ • All Rights Reserved.
       </footer>
     </div>
