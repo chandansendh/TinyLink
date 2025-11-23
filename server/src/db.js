@@ -6,5 +6,4 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// Export in CommonJS format
 module.exports = pool;
