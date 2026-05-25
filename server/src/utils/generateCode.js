@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 module.exports = function generateCode() {
-  return Math.random().toString(36).substring(2, 8);
+  return crypto.randomBytes(3).toString("hex");
 };

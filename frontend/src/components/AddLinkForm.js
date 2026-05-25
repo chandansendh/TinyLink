@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createLink } from "../api/Links";
 import ErrorBox from "./ErrorBox";
+import { IoCloseOutline, IoLinkOutline, IoSparklesOutline } from "react-icons/io5";
 
 export default function AddLinkForm({ onClose, onCreated, baseUrl }) {
   const [targetUrl, setTargetUrl] = useState("");
@@ -12,8 +13,8 @@ export default function AddLinkForm({ onClose, onCreated, baseUrl }) {
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
-    if (!/^https?:\/\//.test(targetUrl)) {
-      setError("Enter valid http/https URL");
+    if (!/^https?:\/\//.test(targetUrl.trim())) {
+      setError("Enter a valid http:// or https:// URL");
       return;
     }
     setLoading(true);
@@ -26,67 +27,90 @@ export default function AddLinkForm({ onClose, onCreated, baseUrl }) {
       setTargetUrl("");
       setCustomCode("");
     } catch (err) {
-      setError(err.error || err.message || "Create failed");
+      setError(err.error || err.message || "Failed to create short link");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded shadow p-6 w-full max-w-lg">
-        <h2 className="text-xl font-bold mb-3">Create Short Link</h2>
-        <form onSubmit={submit} className="space-y-3">
+    <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fade-in">
+      <div className="glass-card rounded-2xl p-8 w-full max-w-lg relative">
+        
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition duration-200"
+        >
+          <IoCloseOutline size={20} />
+        </button>
+
+        <div className="flex items-center gap-2 mb-6">
+          <IoLinkOutline size={22} className="text-violet-400" />
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-400 via-indigo-200 to-cyan-300 bg-clip-text text-transparent">
+            Create Short Link
+          </h2>
+        </div>
+
+        <form onSubmit={submit} className="space-y-6">
           <div>
-            <label className="block text-lg font-semibold text-slate-700">
-              Target URL
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              Destination URL
             </label>
             <input
               value={targetUrl}
               onChange={(e) => setTargetUrl(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-              placeholder="https://example.com/path"
+              className="w-full glass-input px-4 py-3 rounded-xl focus:outline-none"
+              placeholder="https://example.com/deep/path/to/resource"
+              required
             />
           </div>
+
           <div>
-            <label className="block text-lg font-semibold text-slate-700">
-              Custom code (optional)
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              Custom Code <span className="text-xs text-slate-500 font-normal">(optional)</span>
             </label>
             <input
               value={customCode}
               onChange={(e) => setCustomCode(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-              placeholder="6-8 letters or numbers"
+              className="w-full glass-input px-4 py-3 rounded-xl focus:outline-none"
+              placeholder="e.g. mylink"
             />
+            <p className="text-xs text-slate-500 mt-1">3-10 alphanumeric characters</p>
           </div>
+
           {error && <ErrorBox message={error} />}
+
           {created && (
-            <div className="text-green-700 text-sm">
-              Created:{" "}
+            <div className="p-4 bg-emerald-950/40 border border-emerald-500/20 text-emerald-400 rounded-xl flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <IoSparklesOutline size={12} /> Successfully Created!
+              </span>
               <a
                 href={`${baseUrl}/${created.code}`}
                 target="_blank"
                 rel="noreferrer"
-                className="underline"
+                className="underline font-semibold break-all text-emerald-300 hover:text-emerald-200"
               >
                 {baseUrl}/{created.code}
               </a>
             </div>
           )}
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 font-semibold border border-red-500 text-red-500 rounded transition duration-300 transform hover:text-white hover:scale-105 hover:bg-[#e70909]"
+              className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-semibold rounded-xl transition duration-200"
             >
-              Close
+              Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 font-semibold text-[#34A853] bg-white border border-[#34A853] rounded transition duration-300 transform hover:text-[#090a09] hover:scale-105 hover:bg-[#20de53]"
+              className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-[0_4px_15px_rgba(99,102,241,0.25)] hover:shadow-[0_4px_20px_rgba(99,102,241,0.4)] transition duration-200 disabled:opacity-50"
             >
-              {loading ? "Creating..." : "Create"}
+              {loading ? "Creating..." : "Create Link"}
             </button>
           </div>
         </form>

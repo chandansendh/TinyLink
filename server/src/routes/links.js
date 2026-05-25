@@ -4,24 +4,24 @@ const router = express.Router();
 const {
   createShortUrl,
   getAllLinksController,
-  redirectByCode,
   deleteShortUrl,
   analyticsAll,
   analyticsByCode,
-  generateQr,
+  adminGetAllLinks,
+  adminGetStats,
 } = require("../controllers/linkController");
 
-router.post("/shorten", createShortUrl);
+const { protect, optionalAuth, isAdmin } = require("../middleware/authMiddleware");
 
-router.get("/links", getAllLinksController);
+// Regular user/public routes
+router.post("/shorten", optionalAuth, createShortUrl);
+router.get("/links", protect, getAllLinksController);
+router.delete("/links/:id", protect, deleteShortUrl);
+router.get("/analytics/:code", optionalAuth, analyticsByCode);
 
-router.get("/:code", redirectByCode);
-
-router.delete("/links/:id", deleteShortUrl);
-
-router.get("/analytics", analyticsAll);
-router.get("/analytics/:code", analyticsByCode);
-
-router.get("/qr/:code", generateQr);
+// Admin-only protected routes
+router.get("/admin/links", protect, isAdmin, adminGetAllLinks);
+router.delete("/admin/links/:id", protect, isAdmin, deleteShortUrl); // Reuses the delete controller since we integrated admin checking in it
+router.get("/admin/stats", protect, isAdmin, adminGetStats);
 
 module.exports = router;

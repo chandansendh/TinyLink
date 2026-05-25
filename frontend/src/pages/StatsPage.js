@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getLinkStats } from "../api/Links";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function StatsPage() {
   const { code } = useParams();
@@ -12,8 +13,7 @@ export default function StatsPage() {
 
   const baseUrl = process.env.REACT_APP_API_BASE || window.location.origin;
   const shortUrl = `${baseUrl}/${code}`;
-
-  const qrUrl = (process.env.REACT_APP_API_BASE || window.location.origin) + `/api/qr/${code}`;
+  const qrId = `qr-${code}`;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -40,27 +40,26 @@ export default function StatsPage() {
       .finally(() => setLoading(false));
   }, [code]);
 
-  const downloadQR = async () => {
+  const downloadQR = () => {
     try {
-      const response = await fetch(qrUrl);
-      const blob = await response.blob();
+      const canvas = document.getElementById(qrId);
+      if (!canvas) return alert("QR Code not loaded yet!");
 
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `qr-${code}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const pngUrl = canvas
+        .toDataURL("image/png")
+        .replace("image/png", "image/octet-stream");
 
-      window.URL.revokeObjectURL(url);
+      const link = document.createElement("a");
+      link.href = pngUrl;
+      link.download = `qr-${code}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err) {
       console.error("QR download failed:", err);
       alert("Failed to download QR");
     }
   };
-
-
 
   if (loading) return <Loader />;
   if (!stat) return <div className="text-red-600">Not found</div>;
@@ -91,6 +90,7 @@ export default function StatsPage() {
                   getLinkStats(code).then((d) => setStat(d.analytics));
                 }, 500);
               }}
+              rel="noreferrer"
             >
               {shortUrl}
             </a>
@@ -141,10 +141,12 @@ export default function StatsPage() {
         <div className="w-64 flex flex-col justify-center items-center bg-white p-4 rounded shadow mt-6 max-w-xs">
           <h3 className=" font-bold mb-2 text-xl">QR Code</h3>
 
-          <img
-            src={qrUrl}
-            alt="QR Code"
-            className="w-40 h-40 border p-2 bg-white cursor-pointer"
+          <QRCodeCanvas
+            id={qrId}
+            value={shortUrl}
+            size={160}
+            includeMargin={true}
+            className="bg-white p-2 border cursor-pointer"
             onClick={() => setShowQRPopup(true)}
           />
 
@@ -170,10 +172,12 @@ export default function StatsPage() {
               QR Code Preview
             </h2>
 
-            <img
-              src={qrUrl}
-              alt="QR Code Large"
-              className=" w-80 h-80 mx-auto border p-3 bg-white"
+            <QRCodeCanvas
+              id={`${qrId}-large`}
+              value={shortUrl}
+              size={300}
+              includeMargin={true}
+              className="mx-auto border p-3 bg-white"
             />
 
             <div className="flex justify-center mt-4">

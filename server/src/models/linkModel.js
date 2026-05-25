@@ -1,13 +1,13 @@
 const db = require("../db");
 
 
-exports.createLink = async (code, targetUrl) => {
+exports.createLink = async (code, targetUrl, userId = null) => {
   const query = `
-    INSERT INTO links (code, target_url)
-    VALUES ($1, $2)
+    INSERT INTO links (code, target_url, user_id)
+    VALUES ($1, $2, $3)
     RETURNING *;
   `;
-  return db.query(query, [code, targetUrl]);
+  return db.query(query, [code, targetUrl, userId]);
 };
 
 exports.findByCode = async (code) => {
@@ -16,6 +16,13 @@ exports.findByCode = async (code) => {
 
 exports.getAllLinks = async () => {
   return db.query("SELECT * FROM links ORDER BY created_at DESC");
+};
+
+exports.getAllLinksByUser = async (userId) => {
+  return db.query(
+    "SELECT * FROM links WHERE user_id = $1 ORDER BY created_at DESC",
+    [userId]
+  );
 };
 
 exports.updateClicks = async (code) => {

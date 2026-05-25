@@ -22,26 +22,38 @@ async function handle(res) {
 
 
 
+function getHeaders(extraHeaders = {}) {
+  const token = localStorage.getItem("token");
+  const headers = { ...extraHeaders };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export function createLink(data) {
   return fetch(`${API}/api/shorten`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(data),
   }).then(handle);
 }
 
 export function getLinks() {
-  return fetch(`${API}/api/links`).then(handle);
+  return fetch(`${API}/api/links`, {
+    headers: getHeaders(),
+  }).then(handle);
 }
 
 export function getLinkStats(code) {
-  return fetch(`${API}/api/analytics/${code}`).then(handle);
+  return fetch(`${API}/api/analytics/${code}`, {
+    headers: getHeaders(),
+  }).then(handle);
 }
 
 export function deleteLink(id) {
-  return fetch(`${API}/api/links/${id}`, { method: "DELETE" }).then(handle);
-}
-
-export function getQr(code) {
-  return fetch(`${API}/api/qr/${code}`);
+  return fetch(`${API}/api/links/${id}`, {
+    method: "DELETE",
+    headers: getHeaders(),
+  }).then(handle);
 }
